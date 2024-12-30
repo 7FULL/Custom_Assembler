@@ -13,7 +13,7 @@ def assemble(assembler_file, machine_code_file):
     labels = {}  # Dictionary to store labels
     binary_lines = []  # List to store binary instructions
 
-    # First pass: Identify labels and variables
+    # Identify labels and variables
     instruction_index = 0
     for line in lines:
         parts = line.split()
@@ -45,7 +45,7 @@ def assemble(assembler_file, machine_code_file):
         # If it's not a label or variable, it's an instruction
         instruction_index += 1
 
-    # Second pass: Assemble instructions
+    # Assemble instructions
     for line in lines:
         parts = line.split()
 
