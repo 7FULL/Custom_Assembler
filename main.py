@@ -17,7 +17,8 @@ def main():
 
     simulator = Simulator()
     simulator.load_program(mc_filename)
-    #simulator.run()
+    simulator.test_registers()
+    simulator.run()
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 from OPCODE import Opcode
 from REGISTERS import Register
 
+
 def assemble(assembler_file, machine_code_file):
     # Open the assembler file for reading
     with open(assembler_file, 'r') as file:
@@ -36,7 +37,7 @@ def assemble(assembler_file, machine_code_file):
             if var_value in Register.__members__:
                 variables[var_name] = Register[var_value].value[0]  # Store register reference
             elif var_value.isdigit() and 0 <= int(var_value) <= 255:
-                variables[var_name] = format(int(var_value), '08b')  # Store numerical value in binary
+                variables[var_name] = format(int(var_value), '04b')  # Store numerical value in binary
             else:
                 raise ValueError(f"Invalid variable value: {var_value} in line {line}")
             continue
@@ -73,7 +74,7 @@ def assemble(assembler_file, machine_code_file):
                 binary_operands.append(Register[operand].value[0])
             elif operand.isdigit() and 0 <= int(
                     operand) <= 255:  # If the operand is a valid immediate or memory address
-                binary_operands.append(format(int(operand), '08b'))  # Convert to 8-bit binary
+                binary_operands.append(format(int(operand), '04b'))  # Convert to 8-bit binary
             else:
                 raise ValueError(f"Invalid operand: {operand} in instruction {line}")
 
@@ -84,6 +85,9 @@ def assemble(assembler_file, machine_code_file):
         if len(binary_instruction) < 17:
             binary_instruction = binary_instruction + '0' * (17 - len(binary_instruction))
 
+        # Separate the binary instruction by spaces 5 bits 4 bits 4 bits 4 bits
+        binary_instruction = binary_instruction[:5] + " " + binary_instruction[5:9] + " " + binary_instruction[9:13] + " " + binary_instruction[13:]
+
         binary_lines.append(binary_instruction)
 
     # Write the machine code to the output file
@@ -91,6 +95,7 @@ def assemble(assembler_file, machine_code_file):
         file.write("\n".join(binary_lines))
 
     print(f"Assembly complete. Machine code written to {machine_code_file}")
+
 
 # Remove spaces and comments from the code and the lines comments
 def prepare_code(lines):
@@ -111,11 +116,12 @@ def prepare_code(lines):
         parts = line.split()
 
         # Check if any of the parts is a comment and remove it and the rest of the line
-        if "//" in parts:
-            comment_index = parts.index("//")
-            parts = parts[:comment_index]
+        if any("//" in part for part in parts):
+            for i, part in enumerate(parts):
+                if "//" in part:
+                    parts = parts[:i]
+                    break
 
-            # Update the line with the new parts
             line = " ".join(parts)
 
         # Update the line in the list
